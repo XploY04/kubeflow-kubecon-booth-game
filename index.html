@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kubeflow Booth Game</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section id="landingScreen" class="screen landing-screen" aria-labelledby="landingTitle">
+        <div class="brand-mark" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <p class="eyebrow">Kubeflow at KubeCon</p>
+        <h1 id="landingTitle">Build the AI workflow</h1>
+        <p class="intro">Put the shuffled steps in the right order.</p>
+
+        <form id="emailForm" class="email-form" novalidate>
+          <label for="emailInput">Email</label>
+          <input id="emailInput" type="text" inputmode="email" autocomplete="email" placeholder="you@example.com" required>
+          <p id="emailError" class="form-error" role="alert"></p>
+          <p class="privacy-note">Stored locally on this device for booth follow-up.</p>
+          <button class="primary-button" type="submit">Start puzzle</button>
+        </form>
+      </section>
+
+      <section id="gameScreen" class="screen game-screen is-hidden" aria-labelledby="puzzleTitle">
+        <header class="game-header">
+          <div>
+            <p class="eyebrow">Workflow puzzle</p>
+            <h2 id="puzzleTitle"></h2>
+          </div>
+          <span id="scoreChip" class="score-chip">0 solved</span>
+        </header>
+
+        <p class="game-instruction">Tap one card, then tap another to swap them.</p>
+        <div id="feedback" class="feedback" aria-live="polite"></div>
+        <ol id="cardList" class="card-list" aria-label="Workflow steps"></ol>
+
+        <div class="sticky-actions">
+          <button id="shuffleButton" class="secondary-button" type="button">Shuffle</button>
+          <button id="checkButton" class="primary-button" type="button">Check order</button>
+        </div>
+      </section>
+
+      <section id="winScreen" class="screen win-screen is-hidden" aria-labelledby="winTitle">
+        <div class="confetti" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <p class="eyebrow">Puzzle complete</p>
+        <h2 id="winTitle">You built a Kubeflow workflow.</h2>
+        <p id="winExplanation" class="win-copy"></p>
+        <div class="win-stats">
+          <span id="attemptCount">0 checks</span>
+          <span id="solvedCount">0 solved</span>
+        </div>
+        <div class="win-actions">
+          <button id="nextButton" class="primary-button" type="button">Next puzzle</button>
+          <button id="restartButton" class="secondary-button" type="button">Restart this puzzle</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="staff-footer">
+      <button id="exportButton" type="button">Export booth data</button>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
