@@ -26,35 +26,35 @@ const PROFESSIONS = [
     label: "Student / Learner",
     questionCount: 5,
     summary:
-      "Kubeflow is an open-source platform for running machine learning on Kubernetes. You write code in Kubeflow Notebooks, turn the steps into repeatable Kubeflow Pipelines, train with Kubeflow Trainer, tune settings with Katib, track models in Kubeflow Hub, and serve them with KServe. The Kubeflow Dashboard ties it all together."
+      "Kubeflow is an open-source platform for running machine learning on Kubernetes. You write code in Kubeflow Notebooks, turn the steps into repeatable Kubeflow Pipelines, train with Kubeflow Trainer, tune settings with Katib, track models in the Model Registry, and serve them with KServe. The Kubeflow Dashboard ties it all together."
   },
   {
     key: "dataScientist",
     label: "Data Scientist / AI Practitioner",
     questionCount: 6,
     summary:
-      "Your day moves from exploring data in Kubeflow Notebooks to training models with Kubeflow Trainer and searching for better settings with Katib. Spark Operator handles large-scale data prep, Kubeflow Hub keeps a registry of your models, and KServe puts the winning model behind an API."
+      "Your day moves from exploring data in Kubeflow Notebooks to training models with Kubeflow Trainer and searching for better settings with Katib. Kubeflow Pipelines makes the steps reproducible (with caching and parallelism), the Model Registry tracks versions and lineage, and KServe puts the winning model behind an API."
   },
   {
     key: "mlops",
     label: "ML Engineer / MLOps Engineer",
     questionCount: 7,
     summary:
-      "You turn experiments into production. Kubeflow Pipelines automates and schedules repeatable workflows, Kubeflow Trainer scales training, Katib automates tuning, Kubeflow Hub acts as the model registry, and KServe serves models with autoscaling and canary rollouts. Spark Operator runs the heavy data jobs."
+      "You turn experiments into production. Kubeflow Pipelines automates repeatable workflows, Kubeflow Trainer scales training, Katib automates tuning, and the Model Registry promotes the right version. KServe serves models with scale-to-zero, concurrency autoscaling, canary rollouts, and request batching."
   },
   {
     key: "platform",
     label: "Platform Engineer / SRE",
-    questionCount: 7,
     summary:
-      "Kubeflow is Kubernetes-native, so it fits the platform you already run. The Kubeflow Dashboard gives multi-user access, Kubeflow Notebooks provisions workspaces, Spark Operator and Kubeflow Trainer schedule heavy jobs, Katib runs tuning experiments, and KServe handles model serving with autoscaling and scale-to-zero."
+      "Kubeflow is Kubernetes-native, so it fits the platform you already run. Profiles give each team an isolated namespace, Dex handles SSO, and Istio handles mTLS and routing. Kueue and Volcano schedule heavy jobs fairly, Trainer plus JobSet survive node failures, and Prometheus, Grafana, and DCGM-exporter give you observability.",
+    questionCount: 7
   },
   {
     key: "developer",
     label: "Software Developer Building AI Apps",
     questionCount: 6,
     summary:
-      "You can call models without managing the ML stack yourself. KServe exposes a trained model as a REST or gRPC API, Kubeflow Hub helps you find the right model and its metadata, Kubeflow Pipelines runs the repeatable workflow behind your app, and Kubeflow Trainer plus Katib build and tune custom models when you need them."
+      "You can call models without managing the ML stack yourself. KServe exposes a model as a REST, gRPC, or OpenAI-compatible API with serverless scaling, batching, transformers, and safe revision rollouts. The Kubeflow SDK lets you launch jobs from Python, the Model Registry is your version contract, and InferenceGraph chains services for RAG."
   }
 ];
 
@@ -66,436 +66,636 @@ const PROFESSION_BY_KEY = Object.fromEntries(PROFESSIONS.map((p) => [p.key, p]))
 const QUESTION_POOLS = {
   student: [
     {
-      id: "student-what-is-kubeflow",
-      prompt: "In plain terms, what does Kubeflow help you do?",
+      id: "student-runs-on",
+      prompt: "Your laptop fan is screaming during training and a friend says \"use Kubeflow.\" What does Kubeflow run on?",
       options: [
-        "Run machine learning workflows on Kubernetes",
-        "Design websites without code",
-        "Store passwords securely",
-        "Edit videos in the browser"
+        "Your laptop, but louder",
+        "Kubernetes",
+        "Docker Desktop only",
+        "A magical cloud nobody talks about"
       ],
-      correctAnswer: "Run machine learning workflows on Kubernetes",
-      explanation: "Kubeflow is an open-source platform that runs the steps of machine learning on Kubernetes.",
-      component: "Kubeflow Dashboard"
+      correctAnswer: "Kubernetes",
+      explanation: "The K isn't decorative. Kubeflow is an ML toolkit for Kubernetes.",
+      component: "Kubernetes"
     },
     {
-      id: "student-notebooks",
-      prompt: "Which Kubeflow component gives you an interactive place to write and run code, like Jupyter?",
-      options: ["Kubeflow Notebooks", "KServe", "Katib", "Spark Operator"],
+      id: "student-notebooks-ide",
+      prompt: "Which Kubeflow component gives you JupyterLab or VS Code in the cluster with GPUs attached?",
+      options: ["Katib", "KServe", "Kubeflow Notebooks", "Kubeflow Pipelines"],
       correctAnswer: "Kubeflow Notebooks",
-      explanation: "Kubeflow Notebooks are interactive development environments for working with notebooks and code.",
+      explanation: "Notebooks run as a StatefulSet with a persistent volume per user.",
       component: "Kubeflow Notebooks"
     },
     {
-      id: "student-kserve",
-      prompt: "Which Kubeflow component helps serve a trained model as an API?",
-      options: ["KServe", "Katib", "Kubeflow Notebooks", "Spark Operator"],
-      correctAnswer: "KServe",
-      explanation: "KServe is used for model inference and serving on Kubernetes.",
-      component: "KServe"
-    },
-    {
-      id: "student-pipelines",
-      prompt: "You want to run the same ML steps again and again without redoing them by hand. Which component helps?",
-      options: ["Kubeflow Pipelines", "Kubeflow Notebooks", "KServe", "Katib"],
-      correctAnswer: "Kubeflow Pipelines",
-      explanation: "Kubeflow Pipelines turns ML steps into repeatable workflows.",
+      id: "student-pipeline-dag",
+      prompt: "A Kubeflow Pipeline is best described as:",
+      options: [
+        "A long YAML file you cry over",
+        "A DAG where each step runs in its own container",
+        "An actual pipe in Kubernetes",
+        "An Excel sheet of steps"
+      ],
+      correctAnswer: "A DAG where each step runs in its own container",
+      explanation: "Directed Acyclic Graph. Steps run in containers, parallel by default.",
       component: "Kubeflow Pipelines"
     },
     {
-      id: "student-trainer",
-      prompt: "Which Kubeflow component runs model training jobs on Kubernetes?",
-      options: ["Kubeflow Trainer", "KServe", "Kubeflow Hub", "Kubeflow Dashboard"],
-      correctAnswer: "Kubeflow Trainer",
-      explanation: "Kubeflow Trainer runs model training jobs on Kubernetes.",
-      component: "Kubeflow Trainer"
-    },
-    {
-      id: "student-katib",
-      prompt: "Which component automatically searches for the best model settings (hyperparameters)?",
-      options: ["Katib", "Kubeflow Notebooks", "Spark Operator", "KServe"],
+      id: "student-katib-combos",
+      prompt: "You want to test 500 combos of learning rate, batch size, and dropout. The Kubeflow tool for that is:",
+      options: ["Katib", "KServe", "Kubeflow Trainer", "Intuition and prayer"],
       correctAnswer: "Katib",
-      explanation: "Katib does hyperparameter tuning and AutoML-style optimization.",
+      explanation: "Katib does hyperparameter tuning and Neural Architecture Search.",
       component: "Katib"
     },
     {
-      id: "student-dashboard",
-      prompt: "Which part of Kubeflow is the central web UI where you reach all the tools?",
-      options: ["Kubeflow Dashboard", "Katib", "Kubeflow Trainer", "KServe"],
-      correctAnswer: "Kubeflow Dashboard",
-      explanation: "The Kubeflow Dashboard is the central UI for Kubeflow.",
-      component: "Kubeflow Dashboard"
+      id: "student-modular",
+      prompt: "Which statement about Kubeflow is TRUE?",
+      options: [
+        "It only runs on Google Cloud",
+        "It's a single giant binary",
+        "It's a collection of independent open-source subprojects you can use in any subset",
+        "It replaces Python"
+      ],
+      correctAnswer: "It's a collection of independent open-source subprojects you can use in any subset",
+      explanation: "Modular. Use just KFP, just KServe, or the whole stack.",
+      component: "Kubeflow"
     },
     {
-      id: "student-hub",
-      prompt: "Where does Kubeflow keep track of trained models and their details?",
-      options: ["Kubeflow Hub", "Spark Operator", "Kubeflow Notebooks", "Katib"],
-      correctAnswer: "Kubeflow Hub",
-      explanation: "Kubeflow Hub is the model registry that stores models and model metadata.",
-      component: "Kubeflow Hub"
+      id: "student-origin",
+      prompt: "Kubeflow was originally open-sourced by which company, and is now governed under which foundation?",
+      options: [
+        "Meta, then the Linux Foundation",
+        "Google, then the CNCF",
+        "Microsoft, then Apache",
+        "Netflix, then OpenAI"
+      ],
+      correctAnswer: "Google, then the CNCF",
+      explanation: "Born at Google in 2017, joined the CNCF as an incubating project in 2023.",
+      component: "Kubeflow"
     },
     {
-      id: "student-spark",
-      prompt: "Which component runs big data processing jobs using Spark on Kubernetes?",
-      options: ["Spark Operator", "KServe", "Katib", "Kubeflow Hub"],
-      correctAnswer: "Spark Operator",
-      explanation: "Spark Operator runs Spark data processing jobs on Kubernetes.",
-      component: "Spark Operator"
+      id: "student-multitenancy",
+      prompt: "\"Multi-tenancy\" in Kubeflow means:",
+      options: [
+        "Many users live in the cluster physically",
+        "Each team gets an isolated namespace via a Profile, so they don't see each other's work",
+        "Renting Kubeflow from AWS",
+        "Sharing one login"
+      ],
+      correctAnswer: "Each team gets an isolated namespace via a Profile, so they don't see each other's work",
+      explanation: "A Profile wraps a namespace plus RBAC. Isolation without separate clusters.",
+      component: "Profiles"
     },
     {
-      id: "student-kubernetes",
-      prompt: "Kubeflow is built to run on top of which system?",
-      options: ["Kubernetes", "A single laptop only", "A spreadsheet", "A phone app store"],
-      correctAnswer: "Kubernetes",
-      explanation: "Kubeflow is Kubernetes-native, so it runs on Kubernetes clusters.",
-      component: "Kubeflow Dashboard"
+      id: "student-kserve-stage",
+      prompt: "KServe (formerly KFServing) is mainly for which lifecycle stage?",
+      options: ["Data preparation", "Training", "Serving and inference", "Writing documentation"],
+      correctAnswer: "Serving and inference",
+      explanation: "KServe deploys trained models as auto-scaling REST/gRPC endpoints.",
+      component: "KServe"
+    },
+    {
+      id: "student-artifact-store",
+      prompt: "Your pipeline produces a 2 GB model file. Where should it logically be stored?",
+      options: [
+        "Inside a Kubernetes Secret",
+        "An object store (MinIO, S3, or GCS)",
+        "The Pod's /tmp",
+        "A ConfigMap"
+      ],
+      correctAnswer: "An object store (MinIO, S3, or GCS)",
+      explanation: "Artifacts go to object storage. ConfigMaps cap at 1 MiB, so don't even try.",
+      component: "Object storage"
+    },
+    {
+      id: "student-not-subproject",
+      prompt: "Which of these is NOT a Kubeflow subproject?",
+      options: ["Katib", "Kubeflow Trainer", "Kubeflow Pipelines", "Kubernetes itself"],
+      correctAnswer: "Kubernetes itself",
+      explanation: "Kubernetes is the foundation Kubeflow runs on, not part of Kubeflow.",
+      component: "Kubernetes"
     }
   ],
 
   dataScientist: [
     {
-      id: "ds-notebooks",
-      prompt: "You want to explore a dataset and try model ideas interactively. Which component is your starting point?",
-      options: ["Kubeflow Notebooks", "KServe", "Spark Operator", "Kubeflow Dashboard"],
-      correctAnswer: "Kubeflow Notebooks",
-      explanation: "Kubeflow Notebooks give you an interactive environment for exploration and prototyping.",
-      component: "Kubeflow Notebooks"
-    },
-    {
-      id: "ds-katib",
-      prompt: "Tuning learning rate and batch size by hand is slow. Which component automates the search?",
-      options: ["Katib", "Kubeflow Hub", "KServe", "Spark Operator"],
-      correctAnswer: "Katib",
-      explanation: "Katib handles hyperparameter tuning and AutoML-style optimization.",
-      component: "Katib"
-    },
-    {
-      id: "ds-pipelines",
-      prompt: "You want your data-to-model steps to run the same way every time. Which component makes them reproducible?",
-      options: ["Kubeflow Pipelines", "Kubeflow Notebooks", "KServe", "Katib"],
-      correctAnswer: "Kubeflow Pipelines",
-      explanation: "Kubeflow Pipelines makes ML workflows repeatable and reproducible.",
+      id: "ds-dsl-component",
+      prompt: "You slapped @dsl.component on a Python function. You just made a:",
+      options: [
+        "Kubernetes Pod",
+        "Reusable, containerized KFP pipeline step",
+        "Helm chart",
+        "Decorator that does nothing"
+      ],
+      correctAnswer: "Reusable, containerized KFP pipeline step",
+      explanation: "That decorator turns your function into a portable pipeline step.",
       component: "Kubeflow Pipelines"
     },
     {
-      id: "ds-hub",
-      prompt: "You trained several model versions and want to compare and track them. Where do they live?",
-      options: ["Kubeflow Hub", "Spark Operator", "Kubeflow Notebooks", "Katib"],
-      correctAnswer: "Kubeflow Hub",
-      explanation: "Kubeflow Hub is the model registry that stores models and their metadata.",
-      component: "Kubeflow Hub"
-    },
-    {
-      id: "ds-kserve",
-      prompt: "Your best model is ready. Which component turns it into a prediction endpoint?",
-      options: ["KServe", "Katib", "Spark Operator", "Kubeflow Notebooks"],
-      correctAnswer: "KServe",
-      explanation: "KServe serves models for inference behind an API.",
-      component: "KServe"
-    },
-    {
-      id: "ds-trainer",
-      prompt: "Training is too big for one machine. Which component runs the training job across the cluster?",
-      options: ["Kubeflow Trainer", "Kubeflow Dashboard", "Kubeflow Hub", "KServe"],
-      correctAnswer: "Kubeflow Trainer",
-      explanation: "Kubeflow Trainer runs model training jobs, including distributed training, on Kubernetes.",
+      id: "ds-trainer-finetune",
+      prompt: "You're fine-tuning Llama-3 on proprietary data and one GPU won't fit it. The Kubeflow move?",
+      options: [
+        "Buy a bigger GPU",
+        "Submit a TrainJob to Kubeflow Trainer with FSDP or DeepSpeed",
+        "Run it in a Notebook overnight",
+        "Email the model and hope"
+      ],
+      correctAnswer: "Submit a TrainJob to Kubeflow Trainer with FSDP or DeepSpeed",
+      explanation: "Trainer v2's TrainJob orchestrates multi-node, multi-GPU training.",
       component: "Kubeflow Trainer"
     },
     {
-      id: "ds-spark",
-      prompt: "You need to clean and prepare a very large dataset before training. Which component handles it?",
-      options: ["Spark Operator", "Katib", "KServe", "Kubeflow Hub"],
-      correctAnswer: "Spark Operator",
-      explanation: "Spark Operator runs large-scale Spark data processing jobs on Kubernetes.",
-      component: "Spark Operator"
-    },
-    {
-      id: "ds-dashboard",
-      prompt: "Which Kubeflow component is the single web UI you use to reach notebooks, pipelines and experiments?",
-      options: ["Kubeflow Dashboard", "KServe", "Katib", "Spark Operator"],
-      correctAnswer: "Kubeflow Dashboard",
-      explanation: "The Kubeflow Dashboard is the central UI for Kubeflow.",
-      component: "Kubeflow Dashboard"
-    },
-    {
-      id: "ds-pipeline-steps",
-      prompt: "A Kubeflow Pipeline is mainly built from what?",
+      id: "ds-kfp-caching",
+      prompt: "You change step 4 of a 5-step pipeline and re-run. Step 1 (40 min) is skipped. Why?",
       options: [
-        "Reusable steps that connect into a workflow",
-        "A single giant script you can't reuse",
-        "Only manual clicks in a UI",
-        "Spreadsheet formulas"
+        "Kubeflow forgot",
+        "KFP step caching: same inputs reuse cached output",
+        "It silently failed",
+        "Magic"
       ],
-      correctAnswer: "Reusable steps that connect into a workflow",
-      explanation: "Pipelines are made of steps (components) that link together into a repeatable workflow.",
+      correctAnswer: "KFP step caching: same inputs reuse cached output",
+      explanation: "Caching can cut re-run cost by around 80%.",
       component: "Kubeflow Pipelines"
     },
     {
-      id: "ds-katib-automl",
-      prompt: "Besides tuning, what else does Katib support?",
+      id: "ds-katib-bayesian",
+      prompt: "Bayesian Optimization beats Grid Search in Katib because:",
       options: [
-        "AutoML-style optimization to find good models",
-        "Serving models to end users",
-        "Storing raw datasets",
-        "Drawing dashboards"
+        "It sounds smarter",
+        "It builds a probabilistic model and picks promising next configs, so fewer trials",
+        "Grid Search is broken",
+        "It's the only option"
       ],
-      correctAnswer: "AutoML-style optimization to find good models",
-      explanation: "Katib supports hyperparameter tuning and AutoML-style optimization.",
+      correctAnswer: "It builds a probabilistic model and picks promising next configs, so fewer trials",
+      explanation: "Grid tries blindly. Bayesian learns. That matters when each trial costs GPU-hours.",
       component: "Katib"
+    },
+    {
+      id: "ds-model-registry",
+      prompt: "Where do you register a trained model with metadata, lineage, and version history?",
+      options: [
+        "A Slack DM",
+        "A USB stick",
+        "The Kubeflow Model Registry",
+        "model_v7_REAL_FINAL_actually.pkl"
+      ],
+      correctAnswer: "The Kubeflow Model Registry",
+      explanation: "The Model Registry bridges training and KServe. (The last option is sadly common.)",
+      component: "Kubeflow Hub"
+    },
+    {
+      id: "ds-kfp-parallel",
+      prompt: "Two KFP steps share no inputs or outputs. At runtime they:",
+      options: [
+        "Run sequentially in random order",
+        "Crash the pipeline",
+        "Run in parallel automatically",
+        "Need a manual sleep between them"
+      ],
+      correctAnswer: "Run in parallel automatically",
+      explanation: "KFP infers the DAG from data dependencies. Independent steps run in parallel.",
+      component: "Kubeflow Pipelines"
+    },
+    {
+      id: "ds-kfp-artifacts",
+      prompt: "You want to pass a large NumPy array between two pipeline steps. The right pattern?",
+      options: [
+        "Stuff it into a string parameter",
+        "Use an Output[Dataset] artifact and let KFP handle upload/download via object store",
+        "Print it to logs and re-read it",
+        "Save to /tmp and hope the next Pod sees it"
+      ],
+      correctAnswer: "Use an Output[Dataset] artifact and let KFP handle upload/download via object store",
+      explanation: "Small values are parameters; large data are artifacts (datasets, models).",
+      component: "Kubeflow Pipelines"
+    },
+    {
+      id: "ds-kserve-endpoint",
+      prompt: "Your notebook needs to call a model server inside the cluster. The cleanest endpoint to hit?",
+      options: [
+        "The Pod's IP directly",
+        "The KServe InferenceService URL exposed via Istio",
+        "localhost",
+        "The KServe controller's IP"
+      ],
+      correctAnswer: "The KServe InferenceService URL exposed via Istio",
+      explanation: "KServe gives you a stable, versioned URL. Istio handles routing and canary.",
+      component: "KServe"
+    },
+    {
+      id: "ds-katib-early-stop",
+      prompt: "Katib supports early stopping. Why does it matter for your wallet?",
+      options: [
+        "It doesn't, it's just a UI feature",
+        "Bad trials are killed early, so no wasted GPU-hours on doomed configs",
+        "It pauses the good trials",
+        "It's only for NAS"
+      ],
+      correctAnswer: "Bad trials are killed early, so no wasted GPU-hours on doomed configs",
+      explanation: "Hyperband and Median Stop terminate underperformers fast. Real savings.",
+      component: "Katib"
+    },
+    {
+      id: "ds-reproducibility",
+      prompt: "You want reproducibility: same data, same code, same model. The minimum you should version is:",
+      options: [
+        "Just the code",
+        "Code, data, container image, hyperparameters, and the random seed",
+        "Just the hyperparameters",
+        "Whatever feels right"
+      ],
+      correctAnswer: "Code, data, container image, hyperparameters, and the random seed",
+      explanation: "Pin all the ingredients, otherwise \"reproducible\" is fiction. Model Registry, Git, DVC, and container tags handle this together.",
+      component: "Kubeflow Hub"
     }
   ],
 
   mlops: [
     {
-      id: "mlops-pipelines-automate",
-      prompt: "You want training and evaluation to run automatically as one repeatable workflow. Which component do you reach for?",
-      options: ["Kubeflow Pipelines", "Kubeflow Notebooks", "KServe", "Kubeflow Hub"],
-      correctAnswer: "Kubeflow Pipelines",
-      explanation: "Kubeflow Pipelines automates repeatable ML workflows.",
-      component: "Kubeflow Pipelines"
-    },
-    {
-      id: "mlops-kserve-autoscale",
-      prompt: "Your model endpoint needs to scale up under load and back down when idle. Which component handles serving?",
-      options: ["KServe", "Katib", "Spark Operator", "Kubeflow Notebooks"],
-      correctAnswer: "KServe",
-      explanation: "KServe serves models with features like autoscaling for inference traffic.",
+      id: "mlops-kserve-canary",
+      prompt: "New fraud model: 10% canary traffic, 90% to the old one, instant rollback if metrics tank. Which KServe feature?",
+      options: [
+        "Canary rollout via InferenceService traffic splitting",
+        "Manually editing DNS",
+        "Running two clusters",
+        "kubectl delete and pray"
+      ],
+      correctAnswer: "Canary rollout via InferenceService traffic splitting",
+      explanation: "Built on Knative. Percentage split plus one-click rollback.",
       component: "KServe"
     },
     {
-      id: "mlops-katib",
-      prompt: "Which component automates hyperparameter search so you don't tune models by hand?",
-      options: ["Katib", "Kubeflow Hub", "Kubeflow Dashboard", "KServe"],
-      correctAnswer: "Katib",
-      explanation: "Katib automates hyperparameter tuning and AutoML-style optimization.",
-      component: "Katib"
+      id: "mlops-scale-to-zero",
+      prompt: "At 3 AM your inference endpoint gets zero traffic. A properly configured KServe runs how many pods?",
+      options: [
+        "10, just in case",
+        "0, via scale-to-zero on Knative",
+        "1, always",
+        "It depends on the weather"
+      ],
+      correctAnswer: "0, via scale-to-zero on Knative",
+      explanation: "There's a cold-start trade-off, but huge cost savings overnight.",
+      component: "KServe"
     },
     {
-      id: "mlops-hub-registry",
-      prompt: "You need a registry to track model versions and promote the right one to production. Which component is it?",
-      options: ["Kubeflow Hub", "Spark Operator", "Kubeflow Notebooks", "Katib"],
-      correctAnswer: "Kubeflow Hub",
-      explanation: "Kubeflow Hub is the model registry holding models and model metadata.",
-      component: "Kubeflow Hub"
+      id: "mlops-oomkilled",
+      prompt: "Your pipeline keeps dying with OOMKilled. First fix?",
+      options: [
+        "Buy more nodes",
+        "Set proper requests and limits on the component",
+        "Switch ML libraries",
+        "Restart the cluster"
+      ],
+      correctAnswer: "Set proper requests and limits on the component",
+      explanation: "OOMKilled means it exceeded its memory limit. Tune limits before adding hardware.",
+      component: "Kubeflow Pipelines"
     },
     {
-      id: "mlops-trainer-scale",
-      prompt: "Training needs to run across many nodes and GPUs. Which component manages those training jobs?",
-      options: ["Kubeflow Trainer", "Kubeflow Dashboard", "KServe", "Kubeflow Hub"],
-      correctAnswer: "Kubeflow Trainer",
-      explanation: "Kubeflow Trainer runs and scales model training jobs on Kubernetes.",
+      id: "mlops-trainer-v2",
+      prompt: "Trainer v2's TrainJob and TrainingRuntime replaced which legacy mess?",
+      options: [
+        "Spark and Flink jobs",
+        "TFJob, PyTorchJob, MPIJob, MXJob, and XGBoostJob",
+        "Kubernetes Deployments",
+        "Helm charts"
+      ],
+      correctAnswer: "TFJob, PyTorchJob, MPIJob, MXJob, and XGBoostJob",
+      explanation: "One CRD instead of one per framework.",
       component: "Kubeflow Trainer"
     },
     {
-      id: "mlops-spark-etl",
-      prompt: "Your pipeline includes a heavy ETL stage over terabytes of data. Which component runs it?",
-      options: ["Spark Operator", "Katib", "KServe", "Kubeflow Notebooks"],
-      correctAnswer: "Spark Operator",
-      explanation: "Spark Operator runs Spark-based data processing and ETL jobs on Kubernetes.",
-      component: "Spark Operator"
-    },
-    {
-      id: "mlops-pipelines-schedule",
-      prompt: "You want a retraining workflow to run on a recurring schedule. Which component supports scheduled runs?",
-      options: ["Kubeflow Pipelines", "Kubeflow Notebooks", "Kubeflow Hub", "KServe"],
-      correctAnswer: "Kubeflow Pipelines",
-      explanation: "Kubeflow Pipelines can run workflows on a recurring schedule.",
+      id: "mlops-works-on-my-machine",
+      prompt: "\"Works on my notebook but not in production.\" The Kubeflow-native cure?",
+      options: [
+        "Tell them to git gud",
+        "Containerize each pipeline step with pinned deps, so the same image runs everywhere",
+        "Use a different scheduler",
+        "Switch to MLflow"
+      ],
+      correctAnswer: "Containerize each pipeline step with pinned deps, so the same image runs everywhere",
+      explanation: "That's the whole point of containers. Build once, run anywhere.",
       component: "Kubeflow Pipelines"
     },
     {
-      id: "mlops-kserve-canary",
-      prompt: "You want to roll out a new model version to a small share of traffic first. Which component supports canary serving?",
-      options: ["KServe", "Spark Operator", "Katib", "Kubeflow Notebooks"],
-      correctAnswer: "KServe",
-      explanation: "KServe supports model serving patterns like canary rollouts between versions.",
+      id: "mlops-auto-retrain",
+      prompt: "Production data drifts and you want auto-retraining. The cleanest design?",
+      options: [
+        "A cron job and hope",
+        "Drift detector triggers a KFP pipeline that trains, registers, then canaries on KServe",
+        "A calendar reminder",
+        "Page the on-call data scientist"
+      ],
+      correctAnswer: "Drift detector triggers a KFP pipeline that trains, registers, then canaries on KServe",
+      explanation: "Pipelines are the orchestrator. It's a closed feedback loop.",
+      component: "Kubeflow Pipelines"
+    },
+    {
+      id: "mlops-ab-test",
+      prompt: "Two model versions both need production traffic for an A/B test with strict statistical tracking. Which KServe primitive?",
+      options: [
+        "InferenceGraph for traffic routing plus canary weights with metrics",
+        "Two separate Deployments managed by hand",
+        "A Helm chart loop",
+        "Both models in one Pod"
+      ],
+      correctAnswer: "InferenceGraph for traffic routing plus canary weights with metrics",
+      explanation: "KServe supports multi-revision routing with traffic percentages, and metrics flow into Prometheus.",
       component: "KServe"
     },
     {
-      id: "mlops-dashboard",
-      prompt: "Which component gives your team one central UI to view pipelines, experiments and runs?",
-      options: ["Kubeflow Dashboard", "KServe", "Spark Operator", "Katib"],
-      correctAnswer: "Kubeflow Dashboard",
-      explanation: "The Kubeflow Dashboard is the central UI for Kubeflow.",
-      component: "Kubeflow Dashboard"
+      id: "mlops-kpa-concurrency",
+      prompt: "Inference latency spikes during a sale. You want autoscaling on request concurrency, not CPU. The KServe/Knative answer?",
+      options: [
+        "HPA on CPU (default Kubernetes)",
+        "Knative KPA scaling on concurrent requests",
+        "Manually scaling up replicas",
+        "Disabling autoscaling"
+      ],
+      correctAnswer: "Knative KPA scaling on concurrent requests",
+      explanation: "KServe sits on Knative's KPA. Concurrency-based scaling fits inference far better than CPU.",
+      component: "KServe"
     },
     {
-      id: "mlops-pipelines-lineage",
-      prompt: "You want to track which data and steps produced a given model run. Which component records that lineage?",
-      options: ["Kubeflow Pipelines", "Kubeflow Notebooks", "KServe", "Spark Operator"],
-      correctAnswer: "Kubeflow Pipelines",
-      explanation: "Kubeflow Pipelines tracks artifacts and lineage across workflow runs.",
+      id: "mlops-s3-creds",
+      prompt: "A pipeline step needs to talk to S3 with credentials. Best practice?",
+      options: [
+        "Hardcode the keys in the component",
+        "Mount a Kubernetes Secret, or use IRSA / Workload Identity",
+        "Email the key to yourself",
+        "Bake it into the container image"
+      ],
+      correctAnswer: "Mount a Kubernetes Secret, or use IRSA / Workload Identity",
+      explanation: "Mount secrets as env vars or files; better yet, use cloud-native workload identity (IRSA on EKS, Workload Identity on GKE).",
       component: "Kubeflow Pipelines"
+    },
+    {
+      id: "mlops-batching",
+      prompt: "Your KServe model is fine but inference is slow. You profile it: the bottleneck is single-request Python overhead. The lever?",
+      options: [
+        "Increase the Pod count to 100",
+        "Enable request batching in the predictor (e.g. Triton dynamic batching)",
+        "Add more memory",
+        "Rewrite it in Rust"
+      ],
+      correctAnswer: "Enable request batching in the predictor (e.g. Triton dynamic batching)",
+      explanation: "Batching amortizes per-request overhead massively. Triton, TorchServe, and TF-Serving all do this.",
+      component: "KServe"
     }
   ],
 
   platform: [
     {
-      id: "platform-kubernetes-native",
-      prompt: "Kubeflow fits an existing platform because it is built to be what?",
+      id: "platform-profiles",
+      prompt: "Three teams share one Kubeflow cluster. Team A must NOT see Team B's notebooks. Which primitive?",
       options: [
-        "Kubernetes-native",
-        "A standalone desktop app",
-        "A managed spreadsheet",
-        "A single Docker container only"
+        "Separate clusters per team",
+        "Profiles: namespace plus owner plus RBAC",
+        "Trust and vibes",
+        "Hiding everything in Secrets"
       ],
-      correctAnswer: "Kubernetes-native",
-      explanation: "Kubeflow is Kubernetes-native, so it runs on the clusters you already operate.",
-      component: "Kubeflow Dashboard"
+      correctAnswer: "Profiles: namespace plus owner plus RBAC",
+      explanation: "A Profile is a namespace plus ownership plus isolation. Cheap multi-tenancy.",
+      component: "Profiles"
     },
     {
-      id: "platform-dashboard-multiuser",
-      prompt: "Which component provides the central, multi-user web UI for Kubeflow?",
-      options: ["Kubeflow Dashboard", "Katib", "KServe", "Spark Operator"],
-      correctAnswer: "Kubeflow Dashboard",
-      explanation: "The Kubeflow Dashboard is the central UI and supports multiple users.",
-      component: "Kubeflow Dashboard"
+      id: "platform-istio-mtls",
+      prompt: "Every internal Kubeflow service uses mTLS via sidecars. The component is:",
+      options: ["Istio", "Calico", "CoreDNS", "Dex"],
+      correctAnswer: "Istio",
+      explanation: "The Istio service mesh handles mTLS, traffic policy, and routing.",
+      component: "Istio"
     },
     {
-      id: "platform-spark",
-      prompt: "Which component lets teams run Spark data jobs natively on your Kubernetes cluster?",
-      options: ["Spark Operator", "KServe", "Katib", "Kubeflow Hub"],
-      correctAnswer: "Spark Operator",
-      explanation: "Spark Operator runs Spark data processing jobs on Kubernetes.",
-      component: "Spark Operator"
+      id: "platform-kueue-quota",
+      prompt: "Team A grabs 8 H100s for a forgotten notebook. The fairness solution?",
+      options: [
+        "Slack-shame Team A",
+        "Kueue plus ResourceQuotas: queued fair-share with per-namespace caps",
+        "Buy more GPUs",
+        "Disable Notebooks"
+      ],
+      correctAnswer: "Kueue plus ResourceQuotas: queued fair-share with per-namespace caps",
+      explanation: "Kueue does gang scheduling and queueing. ResourceQuotas cap each tenant.",
+      component: "Kueue"
     },
     {
-      id: "platform-kserve-infra",
-      prompt: "Which component owns the serving layer, including autoscaling model endpoints?",
-      options: ["KServe", "Kubeflow Notebooks", "Katib", "Kubeflow Hub"],
-      correctAnswer: "KServe",
-      explanation: "KServe runs the model serving layer with autoscaling for inference.",
-      component: "KServe"
+      id: "platform-artifact-storage",
+      prompt: "What's the default storage for pipeline artifacts?",
+      options: [
+        "/tmp on the node",
+        "An S3-compatible object store (MinIO by default; swap to S3/GCS in prod)",
+        "A giant ConfigMap",
+        "PostgreSQL BLOBs"
+      ],
+      correctAnswer: "An S3-compatible object store (MinIO by default; swap to S3/GCS in prod)",
+      explanation: "MinIO ships out of the box. Swap to managed object storage in production.",
+      component: "Object storage"
     },
     {
-      id: "platform-trainer-resources",
-      prompt: "Which component schedules training jobs and their GPU and CPU requests on the cluster?",
-      options: ["Kubeflow Trainer", "Kubeflow Dashboard", "KServe", "Kubeflow Hub"],
-      correctAnswer: "Kubeflow Trainer",
-      explanation: "Kubeflow Trainer runs training jobs and requests cluster resources for them.",
+      id: "platform-audit",
+      prompt: "A regulator asks for the exact data, code, and hyperparams behind the prod model. The ideal answer is:",
+      options: [
+        "\"Give me 3 weeks\"",
+        "\"One query: the Model Registry links data version, pipeline run, commit, and hyperparams\"",
+        "\"We'll ask the data scientist who left\"",
+        "\"Define 'production'\""
+      ],
+      correctAnswer: "\"One query: the Model Registry links data version, pipeline run, commit, and hyperparams\"",
+      explanation: "Auditability is the whole point of the Model Registry plus KFP run history.",
+      component: "Kubeflow Hub"
+    },
+    {
+      id: "platform-dex-sso",
+      prompt: "Users log in to the Central Dashboard via Google, GitHub, or LDAP SSO. Which component?",
+      options: ["Istio", "Argo", "Dex (an OIDC identity broker)", "Knative"],
+      correctAnswer: "Dex (an OIDC identity broker)",
+      explanation: "Dex federates external identity providers and gives Kubeflow unified login.",
+      component: "Dex"
+    },
+    {
+      id: "platform-volcano-gang",
+      prompt: "Kueue and Volcano both come up in Kubeflow infra discussions. The thing Volcano specializes in:",
+      options: [
+        "Gang scheduling (all-or-nothing pod groups for distributed training)",
+        "Issuing TLS certs",
+        "Storing artifacts",
+        "Running notebooks"
+      ],
+      correctAnswer: "Gang scheduling (all-or-nothing pod groups for distributed training)",
+      explanation: "Distributed training needs all N pods up together or none. Gang scheduling is Volcano's specialty.",
+      component: "Volcano"
+    },
+    {
+      id: "platform-node-failure",
+      prompt: "A node with 8 GPUs dies mid-training. Trainer plus Kubernetes do what by default?",
+      options: [
+        "The pipeline silently fails forever",
+        "JobSet/Trainer reschedules the pods on healthy nodes and the checkpoint resumes the run",
+        "Send a thoughts-and-prayers email",
+        "Crash the entire cluster"
+      ],
+      correctAnswer: "JobSet/Trainer reschedules the pods on healthy nodes and the checkpoint resumes the run",
+      explanation: "Trainer leverages JobSet for resilience; resume-from-checkpoint is the practical safety net.",
       component: "Kubeflow Trainer"
     },
     {
-      id: "platform-notebooks-provision",
-      prompt: "Which component lets you provision per-user notebook workspaces for your data teams?",
-      options: ["Kubeflow Notebooks", "KServe", "Spark Operator", "Katib"],
-      correctAnswer: "Kubeflow Notebooks",
-      explanation: "Kubeflow Notebooks provisions interactive notebook environments for users.",
-      component: "Kubeflow Notebooks"
+      id: "platform-upgrade",
+      prompt: "You're upgrading Kubeflow. The safest sequencing?",
+      options: [
+        "Upgrade everything at once with one script",
+        "Read release notes, upgrade Kubernetes/Istio first, then upgrade components one-by-one in non-prod, smoke test, then prod",
+        "Just kubectl apply the new manifests",
+        "Delete the namespace and reinstall"
+      ],
+      correctAnswer: "Read release notes, upgrade Kubernetes/Istio first, then upgrade components one-by-one in non-prod, smoke test, then prod",
+      explanation: "Kubeflow is many independent subprojects with their own versions. Upgrade gradually.",
+      component: "Kubeflow"
     },
     {
-      id: "platform-pipelines-orchestrate",
-      prompt: "Which component orchestrates multi-step ML workflows as Kubernetes resources?",
-      options: ["Kubeflow Pipelines", "Kubeflow Notebooks", "Kubeflow Hub", "KServe"],
-      correctAnswer: "Kubeflow Pipelines",
-      explanation: "Kubeflow Pipelines orchestrates repeatable ML workflows on Kubernetes.",
-      component: "Kubeflow Pipelines"
-    },
-    {
-      id: "platform-katib-experiments",
-      prompt: "Which component runs tuning experiments as Kubernetes-managed jobs?",
-      options: ["Katib", "Kubeflow Dashboard", "KServe", "Spark Operator"],
-      correctAnswer: "Katib",
-      explanation: "Katib runs hyperparameter tuning experiments on Kubernetes.",
-      component: "Katib"
-    },
-    {
-      id: "platform-kserve-scale-zero",
-      prompt: "You want idle model endpoints to use no resources until a request arrives. Which component supports scale-to-zero serving?",
-      options: ["KServe", "Spark Operator", "Kubeflow Notebooks", "Kubeflow Hub"],
-      correctAnswer: "KServe",
-      explanation: "KServe can scale model endpoints down to zero when idle and back up on demand.",
-      component: "KServe"
-    },
-    {
-      id: "platform-hub-registry",
-      prompt: "Which component acts as the shared model registry across teams?",
-      options: ["Kubeflow Hub", "Spark Operator", "Kubeflow Notebooks", "Katib"],
-      correctAnswer: "Kubeflow Hub",
-      explanation: "Kubeflow Hub is the model registry that stores models and metadata for all teams.",
-      component: "Kubeflow Hub"
+      id: "platform-observability",
+      prompt: "You want cluster-wide observability for ML workloads: GPU utilization, training step duration, inference p95 latency. The standard stack?",
+      options: [
+        "Prometheus (metrics) plus Grafana (dashboards) plus DCGM-exporter (GPU) plus KServe/Trainer metrics endpoints",
+        "kubectl top only",
+        "printf to stdout",
+        "Manual screenshots"
+      ],
+      correctAnswer: "Prometheus (metrics) plus Grafana (dashboards) plus DCGM-exporter (GPU) plus KServe/Trainer metrics endpoints",
+      explanation: "Prometheus scrapes everything; DCGM-exporter is the NVIDIA GPU metric source.",
+      component: "Prometheus"
     }
   ],
 
   developer: [
     {
-      id: "dev-kserve-api",
-      prompt: "You want to call a trained model from your app over REST or gRPC. Which component exposes it?",
-      options: ["KServe", "Katib", "Spark Operator", "Kubeflow Notebooks"],
-      correctAnswer: "KServe",
-      explanation: "KServe serves a trained model as a REST or gRPC inference API.",
+      id: "dev-sdk",
+      prompt: "You don't know Kubernetes but want to launch a training job from Python. The right tool?",
+      options: [
+        "Write raw YAML",
+        "Use the Kubeflow SDK: a Pythonic API across Trainer, Katib, and KServe",
+        "Email the ops team",
+        "kubectl apply blindly"
+      ],
+      correctAnswer: "Use the Kubeflow SDK: a Pythonic API across Trainer, Katib, and KServe",
+      explanation: "The SDK is built so app developers never have to touch Kubernetes.",
+      component: "Kubeflow SDK"
+    },
+    {
+      id: "dev-kserve-protocols",
+      prompt: "Your web app needs to call a model. KServe gives you a stable URL. What protocols does it expose?",
+      options: [
+        "Only REST",
+        "REST (HTTP/JSON) and gRPC, plus OpenAI-compatible for LLMs via the vLLM runtime",
+        "FTP",
+        "WebSocket only"
+      ],
+      correctAnswer: "REST (HTTP/JSON) and gRPC, plus OpenAI-compatible for LLMs via the vLLM runtime",
+      explanation: "Pick REST for simplicity, gRPC for low latency, or the OpenAI-compatible API for LLM apps.",
       component: "KServe"
     },
     {
-      id: "dev-hub-find",
-      prompt: "You need to find the right model and check its metadata before wiring it into your app. Where do you look?",
-      options: ["Kubeflow Hub", "Spark Operator", "Katib", "Kubeflow Dashboard"],
-      correctAnswer: "Kubeflow Hub",
-      explanation: "Kubeflow Hub is the model registry holding models and their metadata.",
+      id: "dev-serverless",
+      prompt: "Your chatbot hits the LLM endpoint 1000x/sec at peak and 0x/sec overnight, and you want to pay only for what you use. KServe gives you:",
+      options: [
+        "A fixed pod count",
+        "Knative-based serverless: scale-to-zero when idle, autoscale on concurrency",
+        "Manual scaling via cron",
+        "A bigger bill"
+      ],
+      correctAnswer: "Knative-based serverless: scale-to-zero when idle, autoscale on concurrency",
+      explanation: "Cold-start is the trade-off; for bursty workloads it's a massive win.",
+      component: "KServe"
+    },
+    {
+      id: "dev-inference-graph",
+      prompt: "You're building a RAG app. Your embedding model and your LLM are two separate InferenceServices. How do you chain them inside the cluster cleanly?",
+      options: [
+        "Have your app call both from outside the cluster",
+        "Use an InferenceGraph: server-side chaining of multiple InferenceServices with one entrypoint",
+        "Stuff both into one container",
+        "Use Helm"
+      ],
+      correctAnswer: "Use an InferenceGraph: server-side chaining of multiple InferenceServices with one entrypoint",
+      explanation: "InferenceGraph composes services as a DAG inside the cluster: fewer network hops, cleaner contract.",
+      component: "KServe"
+    },
+    {
+      id: "dev-dynamic-batching",
+      prompt: "Your app sends one inference request at a time and latency feels high. The fix that needs no change to the model?",
+      options: [
+        "Buy more GPUs",
+        "Enable server-side dynamic batching in the runtime (Triton, TorchServe, or vLLM)",
+        "Rewrite the app in Rust",
+        "Cache nothing"
+      ],
+      correctAnswer: "Enable server-side dynamic batching in the runtime (Triton, TorchServe, or vLLM)",
+      explanation: "The runtime collects concurrent requests and batches them per GPU. Big throughput gain, nearly invisible to clients.",
+      component: "KServe"
+    },
+    {
+      id: "dev-safe-rollout",
+      prompt: "You ship a new model to KServe but don't want users to see it until you've validated it. The pattern?",
+      options: [
+        "Pray",
+        "Deploy it as a new revision with 0% traffic, run shadow traffic and smoke tests, then shift percentage gradually",
+        "Replace the old model entirely at 9 AM",
+        "Use a different cluster"
+      ],
+      correctAnswer: "Deploy it as a new revision with 0% traffic, run shadow traffic and smoke tests, then shift percentage gradually",
+      explanation: "Revision-based deploys plus traffic splitting make rollouts safe. That's the whole purpose of KServe's design.",
+      component: "KServe"
+    },
+    {
+      id: "dev-llm-runtime",
+      prompt: "Your LLM is 70B params and you need fast inference. The serving runtime KServe most commonly pairs with for LLMs?",
+      options: [
+        "TF-Serving",
+        "vLLM (continuous batching, PagedAttention) or Triton with TensorRT-LLM",
+        "flask plus transformers",
+        "Plain python model.py"
+      ],
+      correctAnswer: "vLLM (continuous batching, PagedAttention) or Triton with TensorRT-LLM",
+      explanation: "vLLM and Triton-LLM are purpose-built for LLM throughput. Production reality.",
+      component: "KServe"
+    },
+    {
+      id: "dev-model-version",
+      prompt: "Your app needs to know if the model behind the endpoint changed (e.g. a new fine-tune). The cleanest cluster-side source of truth?",
+      options: [
+        "Trust that the URL didn't change",
+        "Query the Model Registry for the deployed model version, checksum, and lineage",
+        "Diff the responses",
+        "Ask the data scientist"
+      ],
+      correctAnswer: "Query the Model Registry for the deployed model version, checksum, and lineage",
+      explanation: "The Model Registry is the contract between training and serving. Pin a version in your client.",
       component: "Kubeflow Hub"
     },
     {
-      id: "dev-notebooks-prototype",
-      prompt: "You want to quickly prototype against a model in code. Which component gives you that workspace?",
-      options: ["Kubeflow Notebooks", "KServe", "Spark Operator", "Kubeflow Hub"],
-      correctAnswer: "Kubeflow Notebooks",
-      explanation: "Kubeflow Notebooks give you an interactive environment to write and test code.",
-      component: "Kubeflow Notebooks"
-    },
-    {
-      id: "dev-pipelines-backend",
-      prompt: "Your app needs a repeatable workflow to refresh predictions behind the scenes. Which component runs it?",
-      options: ["Kubeflow Pipelines", "Kubeflow Notebooks", "KServe", "Katib"],
-      correctAnswer: "Kubeflow Pipelines",
-      explanation: "Kubeflow Pipelines runs the repeatable workflow behind your app.",
-      component: "Kubeflow Pipelines"
-    },
-    {
-      id: "dev-kserve-endpoint",
-      prompt: "Your app sends input data and expects a prediction back. Which component answers that request?",
-      options: ["KServe", "Kubeflow Hub", "Spark Operator", "Katib"],
-      correctAnswer: "KServe",
-      explanation: "KServe handles inference requests and returns predictions.",
+      id: "dev-transformer",
+      prompt: "Your app expects strict JSON from an LLM, but the model sometimes returns prose. Where does this concern belong?",
+      options: [
+        "Inside the model weights (retrain forever)",
+        "A KServe Transformer (pre/post-processing) or guided decoding in the runtime: server-side, not in every client",
+        "Each frontend client retries 10 times",
+        "Disable JSON"
+      ],
+      correctAnswer: "A KServe Transformer (pre/post-processing) or guided decoding in the runtime: server-side, not in every client",
+      explanation: "KServe lets you attach a transformer container before or after the predictor for exactly this. Enforce the schema once, not in N clients.",
       component: "KServe"
     },
     {
-      id: "dev-trainer-custom",
-      prompt: "You need to train a custom model for your feature. Which component runs the training job?",
-      options: ["Kubeflow Trainer", "KServe", "Kubeflow Dashboard", "Spark Operator"],
-      correctAnswer: "Kubeflow Trainer",
-      explanation: "Kubeflow Trainer runs model training jobs on Kubernetes.",
-      component: "Kubeflow Trainer"
-    },
-    {
-      id: "dev-katib-config",
-      prompt: "Your custom model needs good settings but you don't want to guess. Which component finds them?",
-      options: ["Katib", "KServe", "Kubeflow Notebooks", "Kubeflow Hub"],
-      correctAnswer: "Katib",
-      explanation: "Katib searches for the best hyperparameters automatically.",
-      component: "Katib"
-    },
-    {
-      id: "dev-spark-data",
-      prompt: "Your app generates huge amounts of data to process before it's useful. Which component handles it at scale?",
-      options: ["Spark Operator", "KServe", "Katib", "Kubeflow Hub"],
-      correctAnswer: "Spark Operator",
-      explanation: "Spark Operator runs large-scale data processing jobs on Kubernetes.",
-      component: "Spark Operator"
-    },
-    {
-      id: "dev-dashboard",
-      prompt: "Which component is the central UI where you explore the Kubeflow tools available to you?",
-      options: ["Kubeflow Dashboard", "KServe", "Spark Operator", "Katib"],
-      correctAnswer: "Kubeflow Dashboard",
-      explanation: "The Kubeflow Dashboard is the central UI for Kubeflow.",
-      component: "Kubeflow Dashboard"
-    },
-    {
-      id: "dev-kserve-scale",
-      prompt: "Your app traffic spikes during launches. Which component scales model serving to match demand?",
-      options: ["KServe", "Kubeflow Notebooks", "Kubeflow Hub", "Spark Operator"],
-      correctAnswer: "KServe",
-      explanation: "KServe autoscales model endpoints to match inference traffic.",
-      component: "KServe"
+      id: "dev-auth",
+      prompt: "You're building locally and need to talk to a KServe endpoint behind Istio plus Dex auth. The easiest auth flow for a backend service?",
+      options: [
+        "Hardcode your password",
+        "Use a Kubernetes ServiceAccount token (or OAuth2 client credentials) that Istio and Dex validate",
+        "Disable auth entirely",
+        "Tunnel via SSH forever"
+      ],
+      correctAnswer: "Use a Kubernetes ServiceAccount token (or OAuth2 client credentials) that Istio and Dex validate",
+      explanation: "ServiceAccount tokens and OAuth2 client credentials are the production-safe pattern. Never hardcode.",
+      component: "Dex"
     }
   ]
 };
@@ -797,7 +997,7 @@ function renderQuestion() {
   state.selectedOption = null;
 
   progressLabel.textContent = `Question ${state.currentIndex + 1} of ${total}`;
-  progressBar.style.width = `${((state.currentIndex) / total) * 100}%`;
+  progressBar.style.width = `${(state.currentIndex / total) * 100}%`;
   correctLabel.textContent = `${correctCount()} correct`;
   questionPrompt.textContent = question.prompt;
 
