@@ -813,7 +813,7 @@ const resultSummary = document.querySelector("#resultSummary");
 const resultNote = document.querySelector("#resultNote");
 const viewLeaderboardButton = document.querySelector("#viewLeaderboardButton");
 const tryAgainButton = document.querySelector("#tryAgainButton");
-const feedbackButton = document.querySelector("#feedbackButton");
+const feedbackChip = document.querySelector("#feedbackChip");
 
 const leaderboardList = document.querySelector("#leaderboardList");
 const leaderboardNote = document.querySelector("#leaderboardNote");
@@ -1119,7 +1119,6 @@ function renderResult(core) {
   resultTime.textContent = formatTime(core.timeTakenSeconds);
   resultProfession.textContent = core.professionLabel;
   resultSummary.textContent = PROFESSION_BY_KEY[core.profession].summary;
-  feedbackButton.classList.toggle("is-hidden", !FEEDBACK_FORM_URL);
 }
 
 viewLeaderboardButton.addEventListener("click", () => {
@@ -1132,7 +1131,7 @@ tryAgainButton.addEventListener("click", () => {
   resetToStart();
 });
 
-feedbackButton.addEventListener("click", () => {
+feedbackChip.addEventListener("click", () => {
   if (FEEDBACK_FORM_URL) {
     window.open(FEEDBACK_FORM_URL, "_blank", "noopener");
   }
@@ -1266,6 +1265,7 @@ function resetToStart() {
 // ---------------------------------------------------------------------------
 renderProfessions();
 hydrateProfile();
+feedbackChip.classList.toggle("is-hidden", !FEEDBACK_FORM_URL);
 
 // Deep link: opening /#leaderboard jumps straight to the board (handy for a
 // booth display). Any other hash falls through to the start screen.
