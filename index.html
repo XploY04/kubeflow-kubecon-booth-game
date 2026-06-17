@@ -2,77 +2,119 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Kubeflow Booth Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Test your Kubeflow flow</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <main class="app-shell">
-      <section id="landingScreen" class="screen landing-screen" aria-labelledby="landingTitle">
+      <!-- 1. Start screen -->
+      <section id="startScreen" class="screen start-screen" aria-labelledby="startTitle">
         <div class="brand-mark" aria-hidden="true">
           <span></span>
           <span></span>
           <span></span>
         </div>
         <p class="eyebrow">Kubeflow at KubeCon</p>
-        <h1 id="landingTitle">Build the AI workflow</h1>
-        <p class="intro">Put the shuffled steps in the right order.</p>
+        <h1 id="startTitle">Test your Kubeflow flow</h1>
+        <p class="intro">Answer a quick quiz and see where you land on the booth leaderboard.</p>
 
-        <form id="emailForm" class="email-form" novalidate>
-          <label for="emailInput">Email</label>
-          <input id="emailInput" type="text" inputmode="email" autocomplete="email" placeholder="you@example.com" required>
-          <p id="emailError" class="form-error" role="alert"></p>
-          <p class="privacy-note">Stored locally on this device for booth follow-up.</p>
-          <button class="primary-button" type="submit">Start puzzle</button>
+        <form id="startForm" class="start-form" novalidate>
+          <div class="field">
+            <label for="nameInput">Name</label>
+            <input id="nameInput" type="text" autocomplete="name" placeholder="Your name" required>
+          </div>
+
+          <div class="field">
+            <label for="emailInput">Email</label>
+            <input id="emailInput" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required>
+          </div>
+
+          <fieldset class="field profession-field">
+            <legend>Pick your profession</legend>
+            <div id="professionGroup" class="profession-group"></div>
+          </fieldset>
+
+          <p id="startError" class="form-error" role="alert"></p>
+          <button class="primary-button" type="submit">Start quiz</button>
         </form>
       </section>
 
-      <section id="gameScreen" class="screen game-screen is-hidden" aria-labelledby="puzzleTitle">
-        <header class="game-header">
-          <div>
-            <p class="eyebrow">Workflow puzzle</p>
-            <h2 id="puzzleTitle"></h2>
+      <!-- 2. Quiz screen -->
+      <section id="quizScreen" class="screen quiz-screen is-hidden" aria-labelledby="questionPrompt">
+        <header class="quiz-header">
+          <span id="professionPill" class="pill pill-teal"></span>
+          <div class="quiz-meters">
+            <span id="progressLabel" class="meter">Question 1 of 5</span>
+            <span id="timerLabel" class="meter meter-time" aria-live="off">0:00</span>
+            <span id="correctLabel" class="meter meter-correct">0 correct</span>
           </div>
-          <span id="scoreChip" class="score-chip">0 solved</span>
+          <div class="progress-track" aria-hidden="true">
+            <span id="progressBar" class="progress-fill"></span>
+          </div>
         </header>
 
-        <p class="game-instruction">Tap one card, then tap another to swap them.</p>
-        <div id="feedback" class="feedback" aria-live="polite"></div>
-        <ol id="cardList" class="card-list" aria-label="Workflow steps"></ol>
+        <h2 id="questionPrompt" class="question-prompt"></h2>
+        <ul id="optionsList" class="options-list" aria-label="Answer options"></ul>
 
         <div class="sticky-actions">
-          <button id="shuffleButton" class="secondary-button" type="button">Shuffle</button>
-          <button id="checkButton" class="primary-button" type="button">Check order</button>
+          <button id="nextButton" class="primary-button" type="button" disabled>Next</button>
         </div>
       </section>
 
-      <section id="winScreen" class="screen win-screen is-hidden" aria-labelledby="winTitle">
-        <div class="confetti" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
+      <!-- 3. Result screen -->
+      <section id="resultScreen" class="screen result-screen is-hidden" aria-labelledby="resultTitle">
+        <p class="eyebrow">Quiz complete</p>
+        <h2 id="resultTitle">Nice work!</h2>
+
+        <div class="score-hero">
+          <span class="score-hero-label">Your score</span>
+          <span id="resultScore" class="score-hero-value">0</span>
         </div>
-        <p class="eyebrow">Puzzle complete</p>
-        <h2 id="winTitle">You built a Kubeflow workflow.</h2>
-        <p id="winExplanation" class="win-copy"></p>
-        <div class="win-stats">
-          <span id="attemptCount">0 checks</span>
-          <span id="solvedCount">0 solved</span>
+
+        <div class="result-stats">
+          <div class="stat-card">
+            <span class="stat-label">Correct</span>
+            <span id="resultCorrect" class="stat-value">0 / 0</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Time</span>
+            <span id="resultTime" class="stat-value">0:00</span>
+          </div>
+          <div class="stat-card stat-card-wide">
+            <span class="stat-label">Profession</span>
+            <span id="resultProfession" class="stat-value"></span>
+          </div>
         </div>
-        <div class="win-actions">
-          <button id="nextButton" class="primary-button" type="button">Next puzzle</button>
-          <button id="restartButton" class="secondary-button" type="button">Restart this puzzle</button>
+
+        <div class="summary-card">
+          <p class="summary-title">What you just learned</p>
+          <p id="resultSummary" class="summary-copy"></p>
+        </div>
+
+        <p id="resultNote" class="result-note is-hidden" role="alert"></p>
+
+        <div class="stacked-actions">
+          <button id="viewLeaderboardButton" class="primary-button" type="button">View leaderboard</button>
+          <button id="tryAgainButton" class="secondary-button" type="button">Try again</button>
+        </div>
+      </section>
+
+      <!-- 4. Leaderboard screen -->
+      <section id="leaderboardScreen" class="screen leaderboard-screen is-hidden" aria-labelledby="leaderboardTitle">
+        <p class="eyebrow">Booth leaderboard</p>
+        <h2 id="leaderboardTitle">Top players</h2>
+        <p id="leaderboardNote" class="leaderboard-note is-hidden"></p>
+        <div id="leaderboardStatus" class="leaderboard-status">Loading leaderboard…</div>
+        <ol id="leaderboardList" class="leaderboard-list" aria-label="Leaderboard"></ol>
+
+        <div class="stacked-actions">
+          <button id="backToResultButton" class="secondary-button is-hidden" type="button">Back to result</button>
+          <button id="playAgainButton" class="primary-button" type="button">Play again</button>
         </div>
       </section>
     </main>
 
-    <footer class="staff-footer">
-      <button id="exportButton" type="button">Export booth data</button>
-    </footer>
-
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>
