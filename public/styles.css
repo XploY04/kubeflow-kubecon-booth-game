@@ -163,7 +163,7 @@ h2 {
 /* Start screen ---------------------------------------------------------- */
 .start-form {
   display: grid;
-  gap: 16px;
+  gap: 20px;
 }
 
 .field {
@@ -202,6 +202,7 @@ h2 {
 .profession-group {
   display: grid;
   gap: 10px;
+  margin-top: 6px;
 }
 
 .profession-option {

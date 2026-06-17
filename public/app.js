@@ -1258,4 +1258,12 @@ function resetToStart() {
 // ---------------------------------------------------------------------------
 renderProfessions();
 hydrateProfile();
-showScreen("start");
+
+// Deep link: opening /#leaderboard jumps straight to the board (handy for a
+// booth display). Any other hash falls through to the start screen.
+if (window.location.hash === "#leaderboard") {
+  showScreen("leaderboard");
+  loadLeaderboard();
+} else {
+  showScreen("start");
+}
