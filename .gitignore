@@ -7,6 +7,9 @@ serviceAccountKey.json
 .env
 .env.*
 
+# Firebase CLI deploy cache
+.firebase/
+
 # OS / editor cruft
 .DS_Store
 node_modules/
