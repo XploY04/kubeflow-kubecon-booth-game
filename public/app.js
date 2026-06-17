@@ -914,11 +914,7 @@ function renderProfessions() {
     text.className = "profession-text";
     text.textContent = profession.label;
 
-    const count = document.createElement("span");
-    count.className = "profession-count";
-    count.textContent = `${profession.questionCount} questions`;
-
-    label.append(input, text, count);
+    label.append(input, text);
     professionGroup.append(label);
   });
 }
