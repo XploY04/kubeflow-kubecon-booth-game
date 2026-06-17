@@ -199,10 +199,6 @@ h2 {
   box-shadow: 0 0 0 4px rgba(36, 104, 242, 0.14);
 }
 
-.profession-field {
-  padding: 0 12px;
-}
-
 .profession-group {
   display: grid;
   gap: 10px;
