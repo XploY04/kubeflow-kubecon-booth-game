@@ -1,15 +1,10 @@
 {
   "hosting": {
-    "public": ".",
+    "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**",
-      "*firebase-adminsdk*.json",
-      "*-service-account*.json",
-      "serviceAccountKey.json",
-      "firestore.rules",
-      "*.log"
+      "**/node_modules/**"
     ]
   },
   "firestore": {
