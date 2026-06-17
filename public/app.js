@@ -725,9 +725,24 @@ function readJson(key, fallback) {
   }
 }
 
+// Normalize an email into a stable, path-safe Firestore document id so the same
+// person always maps to one record.
+function emailDocId(email) {
+  return String(email).trim().toLowerCase().replace(/\//g, "_");
+}
+
+// One local record per email, keeping the best score (mirrors the Firestore rule).
 function saveLocalSubmission(record) {
   const list = readJson(STORAGE_KEYS.submissions, []);
-  list.push(record);
+  const key = emailDocId(record.email);
+  const index = list.findIndex((row) => emailDocId(row.email) === key);
+  if (index >= 0) {
+    if ((record.score || 0) > (list[index].score || 0)) {
+      list[index] = record;
+    }
+  } else {
+    list.push(record);
+  }
   localStorage.setItem(STORAGE_KEYS.submissions, JSON.stringify(list));
 }
 
@@ -758,7 +773,9 @@ async function getFirebase() {
       firebaseHandle = {
         db,
         collection: fsMod.collection,
-        addDoc: fsMod.addDoc,
+        doc: fsMod.doc,
+        getDoc: fsMod.getDoc,
+        setDoc: fsMod.setDoc,
         getDocs: fsMod.getDocs,
         query: fsMod.query,
         orderBy: fsMod.orderBy,
@@ -1077,27 +1094,32 @@ async function saveSubmission(core) {
   resultNote.classList.add("is-hidden");
   resultNote.classList.remove("is-warning");
 
-  const localRecord = { ...core, id: `local-${Date.now()}`, submittedAt: Date.now() };
+  const docId = emailDocId(core.email);
+  const localRecord = { ...core, id: docId, submittedAt: Date.now() };
+  localStorage.setItem(STORAGE_KEYS.lastSubmissionId, docId);
+
   const firebase = await getFirebase();
 
   if (!firebase) {
     saveLocalSubmission(localRecord);
-    localStorage.setItem(STORAGE_KEYS.lastSubmissionId, localRecord.id);
     showResultNote("Saved on this device. The booth leaderboard isn't connected right now.");
     return;
   }
 
   try {
-    const ref = await firebase.addDoc(firebase.collection(firebase.db, SUBMISSIONS_COLLECTION), {
-      ...core,
-      submittedAt: firebase.serverTimestamp()
-    });
-    localStorage.setItem(STORAGE_KEYS.lastSubmissionId, ref.id);
-    saveLocalSubmission({ ...localRecord, id: ref.id });
+    // One record per email: read the existing best, only overwrite if this run
+    // beats it. A worse retake leaves the standing score untouched.
+    const ref = firebase.doc(firebase.db, SUBMISSIONS_COLLECTION, docId);
+    const snapshot = await firebase.getDoc(ref);
+    const previousScore = snapshot.exists() ? snapshot.data().score : null;
+
+    if (previousScore === null || core.score > previousScore) {
+      await firebase.setDoc(ref, { ...core, submittedAt: firebase.serverTimestamp() });
+    }
+    saveLocalSubmission(localRecord);
   } catch (error) {
     console.warn("Submission write failed, keeping result locally.", error);
     saveLocalSubmission(localRecord);
-    localStorage.setItem(STORAGE_KEYS.lastSubmissionId, localRecord.id);
     showResultNote("We couldn't reach the leaderboard, so your score is saved on this device.");
   }
 }
@@ -1173,7 +1195,17 @@ async function loadLeaderboard() {
 }
 
 function renderLeaderboard(rows, { local, message }) {
-  const top = rows.slice(0, 20);
+  // One row per email (rows arrive sorted best-first, so the first wins). Guards
+  // against any duplicate records left over from before email keying.
+  const seenEmails = new Set();
+  const deduped = rows.filter((row) => {
+    const key = emailDocId(row.email || "");
+    if (!key) return true;
+    if (seenEmails.has(key)) return false;
+    seenEmails.add(key);
+    return true;
+  });
+  const top = deduped.slice(0, 20);
   const lastId = localStorage.getItem(STORAGE_KEYS.lastSubmissionId);
 
   leaderboardList.innerHTML = "";

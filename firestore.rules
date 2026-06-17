@@ -3,33 +3,45 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /submissions/{submissionId} {
       allow read: if true;
-      allow create: if
-        request.resource.data.keys().hasOnly([
-          'name',
-          'email',
-          'profession',
-          'professionLabel',
-          'score',
-          'correctAnswers',
-          'totalQuestions',
-          'timeTakenSeconds',
-          'submittedAt',
-          'answers'
-        ])
-        && request.resource.data.name is string
-        && request.resource.data.email is string
-        && request.resource.data.profession in [
-          'student',
-          'dataScientist',
-          'mlops',
-          'platform',
-          'developer'
-        ]
-        && request.resource.data.score is number
-        && request.resource.data.correctAnswers is number
-        && request.resource.data.totalQuestions is number
-        && request.resource.data.timeTakenSeconds is number;
-      allow update, delete: if false;
+
+      allow create: if isValidSubmission();
+
+      // Same person (keyed by email) can refresh their record, but only to a
+      // score that is not lower than the one already stored. No score is ever
+      // overwritten downward, and the email on the record cannot change.
+      allow update: if isValidSubmission()
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.score >= resource.data.score;
+
+      allow delete: if false;
+
+      function isValidSubmission() {
+        return request.resource.data.keys().hasOnly([
+            'name',
+            'email',
+            'profession',
+            'professionLabel',
+            'score',
+            'correctAnswers',
+            'totalQuestions',
+            'timeTakenSeconds',
+            'submittedAt',
+            'answers'
+          ])
+          && request.resource.data.name is string
+          && request.resource.data.email is string
+          && request.resource.data.profession in [
+            'student',
+            'dataScientist',
+            'mlops',
+            'platform',
+            'developer'
+          ]
+          && request.resource.data.score is number
+          && request.resource.data.correctAnswers is number
+          && request.resource.data.totalQuestions is number
+          && request.resource.data.timeTakenSeconds is number;
+      }
     }
   }
 }
