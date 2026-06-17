@@ -160,6 +160,19 @@ h2 {
   margin-top: 22px;
 }
 
+.feedback-link {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 14px;
+  border: 0;
+  background: transparent;
+  color: var(--teal);
+  font-size: 0.92rem;
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* Start screen ---------------------------------------------------------- */
 .start-form {
   display: grid;

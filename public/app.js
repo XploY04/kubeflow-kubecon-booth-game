@@ -17,6 +17,10 @@ const firebaseConfig = {
 const FIREBASE_SDK_VERSION = "10.12.2";
 const SUBMISSIONS_COLLECTION = "submissions";
 
+// Feedback Google Form. Paste the form's share/embed URL here to show the
+// "Share your feedback" button on the result screen. Leave empty to hide it.
+const FEEDBACK_FORM_URL = "";
+
 // ---------------------------------------------------------------------------
 // Professions
 // ---------------------------------------------------------------------------
@@ -809,6 +813,7 @@ const resultSummary = document.querySelector("#resultSummary");
 const resultNote = document.querySelector("#resultNote");
 const viewLeaderboardButton = document.querySelector("#viewLeaderboardButton");
 const tryAgainButton = document.querySelector("#tryAgainButton");
+const feedbackButton = document.querySelector("#feedbackButton");
 
 const leaderboardList = document.querySelector("#leaderboardList");
 const leaderboardNote = document.querySelector("#leaderboardNote");
@@ -1118,6 +1123,7 @@ function renderResult(core) {
   resultTime.textContent = formatTime(core.timeTakenSeconds);
   resultProfession.textContent = core.professionLabel;
   resultSummary.textContent = PROFESSION_BY_KEY[core.profession].summary;
+  feedbackButton.classList.toggle("is-hidden", !FEEDBACK_FORM_URL);
 }
 
 viewLeaderboardButton.addEventListener("click", () => {
@@ -1128,6 +1134,12 @@ viewLeaderboardButton.addEventListener("click", () => {
 
 tryAgainButton.addEventListener("click", () => {
   resetToStart();
+});
+
+feedbackButton.addEventListener("click", () => {
+  if (FEEDBACK_FORM_URL) {
+    window.open(FEEDBACK_FORM_URL, "_blank", "noopener");
+  }
 });
 
 // ---------------------------------------------------------------------------
