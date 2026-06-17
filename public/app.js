@@ -19,7 +19,7 @@ const SUBMISSIONS_COLLECTION = "submissions";
 
 // Feedback Google Form. Paste the form's share/embed URL here to show the
 // "Share your feedback" button on the result screen. Leave empty to hide it.
-const FEEDBACK_FORM_URL = "";
+const FEEDBACK_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfy45fMUuWIbpgaeh4TTH6SAvgPWqZnfJKjQ5U7TzHEKvC6fw/viewform";
 
 // ---------------------------------------------------------------------------
 // Professions
