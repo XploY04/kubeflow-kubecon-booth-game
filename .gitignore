@@ -1,0 +1,12 @@
+# Firebase Admin SDK service-account keys — server-side secrets, never commit
+*firebase-adminsdk*.json
+*-service-account*.json
+serviceAccountKey.json
+
+# Local env / secrets
+.env
+.env.*
+
+# OS / editor cruft
+.DS_Store
+node_modules/

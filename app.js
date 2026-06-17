@@ -1,17 +1,17 @@
 // ---------------------------------------------------------------------------
 // Firebase config
 // ---------------------------------------------------------------------------
-// Frontend Firebase config is safe to ship in the browser. Replace the
-// placeholder values below with your project's web config. If the values are
-// left as placeholders (or the SDK fails to load) the app runs in a local
-// fallback mode that stores submissions on this device only.
+// Frontend Firebase web-app config — safe to ship in the browser (this is NOT
+// the Admin SDK service-account key). Firestore access is gated by the rules in
+// firestore.rules. If these values are placeholders, or the SDK fails to load,
+// the app falls back to local-only storage on this device.
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyALCTT5KiPx-pbE7smBjY4jRedvHX6kdpI",
+  authDomain: "kubeflow-kc.firebaseapp.com",
+  projectId: "kubeflow-kc",
+  storageBucket: "kubeflow-kc.firebasestorage.app",
+  messagingSenderId: "540767702222",
+  appId: "1:540767702222:web:f21831562824b6dbf9d49f"
 };
 
 const FIREBASE_SDK_VERSION = "10.12.2";
