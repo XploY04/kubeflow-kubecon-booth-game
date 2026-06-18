@@ -16,6 +16,7 @@ const firebaseConfig = {
 
 const FIREBASE_SDK_VERSION = "10.12.2";
 const SUBMISSIONS_COLLECTION = "submissions";
+const LEADS_COLLECTION = "leads";
 
 // Feedback Google Form. Paste the form's share/embed URL here to show the
 // "Share your feedback" button on the result screen. Leave empty to hide it.
@@ -966,6 +967,13 @@ startForm.addEventListener("submit", (event) => {
   state.profession = selected.value;
   localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify({ name, email }));
 
+  recordLead({
+    name,
+    email,
+    profession: state.profession,
+    professionLabel: PROFESSION_BY_KEY[state.profession].label
+  });
+
   startQuiz();
 });
 
@@ -1088,6 +1096,19 @@ async function finishQuiz() {
   showScreen("result");
 
   await saveSubmission(core);
+}
+
+// Captured at quiz start so we keep the visitor's details even if they never
+// finish. Keyed by email (one lead per person), best-effort, non-blocking.
+async function recordLead(lead) {
+  const firebase = await getFirebase();
+  if (!firebase) return;
+  try {
+    const ref = firebase.doc(firebase.db, LEADS_COLLECTION, emailDocId(lead.email));
+    await firebase.setDoc(ref, { ...lead, startedAt: firebase.serverTimestamp() });
+  } catch (error) {
+    console.warn("Lead capture failed.", error);
+  }
 }
 
 async function saveSubmission(core) {

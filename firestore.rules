@@ -43,5 +43,33 @@ service cloud.firestore {
           && request.resource.data.timeTakenSeconds is number;
       }
     }
+
+    // Lead capture: written when a visitor starts the quiz. Keyed by email, so
+    // create + update (one record per person). No client reads (it's a contact
+    // list, console-only) and no client deletes.
+    match /leads/{leadId} {
+      allow read: if false;
+      allow create, update: if isValidLead();
+      allow delete: if false;
+
+      function isValidLead() {
+        return request.resource.data.keys().hasOnly([
+            'name',
+            'email',
+            'profession',
+            'professionLabel',
+            'startedAt'
+          ])
+          && request.resource.data.name is string
+          && request.resource.data.email is string
+          && request.resource.data.profession in [
+            'student',
+            'dataScientist',
+            'mlops',
+            'platform',
+            'developer'
+          ];
+      }
+    }
   }
 }
