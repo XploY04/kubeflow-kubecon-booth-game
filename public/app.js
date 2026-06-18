@@ -28,21 +28,21 @@ const PROFESSIONS = [
   {
     key: "student",
     label: "Student / Learner",
-    questionCount: 10,
+    questionCount: 3,
     summary:
       "Kubeflow is an open-source platform for running machine learning on Kubernetes. You write code in Kubeflow Notebooks, turn the steps into repeatable Kubeflow Pipelines, train with Kubeflow Trainer, tune settings with Katib, track models in the Model Registry, and serve them with KServe. The Kubeflow Dashboard ties it all together."
   },
   {
     key: "dataScientist",
     label: "Data Scientist / AI Practitioner",
-    questionCount: 10,
+    questionCount: 3,
     summary:
       "Your day moves from exploring data in Kubeflow Notebooks to training models with Kubeflow Trainer and searching for better settings with Katib. Kubeflow Pipelines makes the steps reproducible (with caching and parallelism), the Model Registry tracks versions and lineage, and KServe puts the winning model behind an API."
   },
   {
     key: "mlops",
     label: "ML Engineer / MLOps Engineer",
-    questionCount: 10,
+    questionCount: 3,
     summary:
       "You turn experiments into production. Kubeflow Pipelines automates repeatable workflows, Kubeflow Trainer scales training, Katib automates tuning, and the Model Registry promotes the right version. KServe serves models with scale-to-zero, concurrency autoscaling, canary rollouts, and request batching."
   },
@@ -51,12 +51,12 @@ const PROFESSIONS = [
     label: "Platform Engineer / SRE",
     summary:
       "Kubeflow is Kubernetes-native, so it fits the platform you already run. Profiles give each team an isolated namespace, Dex handles SSO, and Istio handles mTLS and routing. Kueue and Volcano schedule heavy jobs fairly, Trainer plus JobSet survive node failures, and Prometheus, Grafana, and DCGM-exporter give you observability.",
-    questionCount: 10
+    questionCount: 3
   },
   {
     key: "developer",
     label: "Software Developer Building AI Apps",
-    questionCount: 10,
+    questionCount: 3,
     summary:
       "You can call models without managing the ML stack yourself. KServe exposes a model as a REST, gRPC, or OpenAI-compatible API with serverless scaling, batching, transformers, and safe revision rollouts. The Kubeflow SDK lets you launch jobs from Python, the Model Registry is your version contract, and InferenceGraph chains services for RAG."
   }
